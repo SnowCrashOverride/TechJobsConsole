@@ -16,10 +16,6 @@ namespace TechJobsConsole
             return AllJobs;
         }
 
-        /*
-         * Returns a list of all values contained in a given column,
-         * without duplicates. 
-         */
         public static List<string> FindAll(string column)
         {
             LoadData();
@@ -40,7 +36,6 @@ namespace TechJobsConsole
 
         public static List<Dictionary<string, string>> FindByColumnAndValue(string column, string value)
         {
-            // load data, if not already loaded
             LoadData();
 
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
@@ -48,6 +43,7 @@ namespace TechJobsConsole
             foreach (Dictionary<string, string> row in AllJobs)
             {
                 string aValue = row[column];
+                aValue = aValue.ToLower();   
 
                 if (aValue.Contains(value))
                 {
@@ -58,9 +54,29 @@ namespace TechJobsConsole
             return jobs;
         }
 
-        /*
-         * Load and parse data from job_data.csv
-         */
+        public static List<Dictionary<string, string>> FindByValue(string searchTerm)
+        {
+            LoadData();
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> row in AllJobs)
+            {
+                string aValue = "";
+                foreach (KeyValuePair<string, string> column in row)
+                    aValue += column.Value;
+                aValue = aValue.ToLower();   
+
+                if (aValue.Contains(searchTerm))
+                {
+                    jobs.Add(row);
+                }
+            }
+
+            return jobs;
+        }
+
+
         private static void LoadData()
         {
 
@@ -86,8 +102,7 @@ namespace TechJobsConsole
 
             string[] headers = rows[0];
             rows.Remove(headers);
-
-            // Parse each row array into a more friendly Dictionary
+            
             foreach (string[] row in rows)
             {
                 Dictionary<string, string> rowDict = new Dictionary<string, string>();
@@ -102,16 +117,13 @@ namespace TechJobsConsole
             IsDataLoaded = true;
         }
 
-        /*
-         * Parse a single line of a CSV file into a string array
-         */
+      
         private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
         {
             bool isBetweenQuotes = false;
             StringBuilder valueBuilder = new StringBuilder();
             List<string> rowValues = new List<string>();
 
-            // Loop through the row string one char at a time
             foreach (char c in row.ToCharArray())
             {
                 if ((c == fieldSeparator && !isBetweenQuotes))
@@ -132,7 +144,6 @@ namespace TechJobsConsole
                 }
             }
 
-            // Add the final value
             rowValues.Add(valueBuilder.ToString());
             valueBuilder.Clear();
 
